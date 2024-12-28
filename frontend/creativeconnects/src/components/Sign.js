@@ -36,8 +36,11 @@ const Signin = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token); // Store JWT token in localStorage
+        const { slug } = data.user; // Extract slug from response
 
+        localStorage.setItem('token', data.token); // Store JWT token in localStorage
+        localStorage.setItem('user', JSON.stringify(data.user));
+       
         Swal.fire({
           title: 'Success!',
           text: 'You are now logged in!',
@@ -46,11 +49,11 @@ const Signin = () => {
         }).then(() => {
           // Navigate to different dashboards based on user type
           if (userType === 'seller') {
-            navigate('/SellerDashboard');
+            navigate(`/SellerDashboard/${slug}`);
           } else if (userType === 'buyer') {
-            navigate('/BuyerDashboard');
+            navigate(`/BuyerDashboard/${slug}`);
           } else {
-            navigate('/BuyerDashboard'); // Redirect to Skill Swapper dashboard
+            navigate(`/SkillSwapper/${slug}`); // Redirect to Skill Swapper dashboard
           }
         });
       } else {

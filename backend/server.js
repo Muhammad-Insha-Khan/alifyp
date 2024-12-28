@@ -17,7 +17,9 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins (for testing purposes)
+}));
 app.use(bodyParser.json());
 
 // Buyer routes
@@ -37,6 +39,7 @@ app.use(errorHandler);
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

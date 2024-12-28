@@ -45,10 +45,22 @@ const signinBuyer = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ id: buyer._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    const slug = `${buyer.firstName}-${buyer.lastName}-${buyer._id}${randomDigits}`;
 
     res.status(200).json({
       message: 'Sign-in successful',
       token,
+      user: {
+        id: buyer._id,
+        firstName: buyer.firstName,
+        lastName: buyer.lastName,
+        email: buyer.email,
+        phone: buyer.phone,
+        fieldDomain: buyer.fieldDomain,
+        interests: buyer.interests,
+        slug,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

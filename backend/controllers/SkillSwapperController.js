@@ -84,8 +84,27 @@ const signinSkillSwapper = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    const slug = `${user.firstName}-${user.lastName}-${user._id}${randomDigits}`;
 
-    res.json({ token });
+    res.json({
+      message: 'Sign-in successful', 
+      token, 
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          expertiseHave: user.expertiseHave,
+          expertiseLookingFor: user.expertiseLookingFor,
+          slug,
+        },
+      
+      
+      
+      
+      });
 
   } catch (error) {
     console.error(error);
