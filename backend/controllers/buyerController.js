@@ -67,4 +67,102 @@ const signinBuyer = async (req, res) => {
   }
 };
 
-module.exports = { registerBuyer, signinBuyer };
+
+//fuctyion
+const submitProjectProposal = async (req, res) => {
+  const { projectTitle, requiredSkills, minBudget, maxBudget, timeLimit, expertiseLevel, projectDescription } = req.body;
+
+  try {
+    // Find the buyer by ID (assuming the buyer is logged in and the token contains the buyer ID)
+    const buyer = await Buyer.findById(req.user.id);
+    if (!buyer) {
+      return res.status(400).json({ message: 'Buyer not found' });
+    }
+
+    // Add the new proposal to the projectProposals array
+    buyer.projectProposals.push({
+      projectTitle,
+      requiredSkills,
+      minBudget,
+      maxBudget,
+      timeLimit,
+      expertiseLevel,
+      projectDescription
+    });
+
+    // Save the updated buyer
+    await buyer.save();
+
+    res.status(200).json({ message: 'Project proposal submitted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+//new on efunc
+const addJobDescription = async (req, res) => {
+  try {
+    // Extract job description data from the request body
+    const { jobTitle, workingHours, companyName, educationalBackground, skillsQualifications, jobDescription, jobType } = req.body;
+
+    // Validate the data
+    if (!jobTitle || !workingHours || !companyName || !educationalBackground || !skillsQualifications || !jobDescription || !jobType) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Find the buyer (authenticated user)
+    const buyer = await Buyer.findById(req.user.id);
+    if (!buyer) {
+      return res.status(404).json({ message: 'Buyer not found' });
+    }
+
+    // Add the job description to the buyer's jobDescriptions array
+    buyer.jobDescriptions.push({
+      jobTitle,
+      workingHours,
+      companyName,
+      educationalBackground,
+      skillsQualifications,
+      jobDescription,
+      jobType,
+    });
+
+    // Save the buyer document
+    await buyer.save();
+
+    // Respond with success message
+    res.status(200).json({ message: 'Job description submitted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const getProjectProposals = async (req, res) => {
+  try {
+    const buyer = await Buyer.findById(req.user.id);
+    if (!buyer) {
+      return res.status(404).json({ message: 'Buyer not found' });
+    }
+    res.status(200).json({ projectProposals: buyer.projectProposals });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get all job descriptions of logged-in buyer
+const getJobDescriptions = async (req, res) => {
+  try {
+    const buyer = await Buyer.findById(req.user.id);
+    if (!buyer) {
+      return res.status(404).json({ message: 'Buyer not found' });
+    }
+
+    res.status(200).json({ jobDescriptions: buyer.jobDescriptions });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+module.exports = { registerBuyer, signinBuyer, submitProjectProposal , addJobDescription , getProjectProposals , getJobDescriptions};

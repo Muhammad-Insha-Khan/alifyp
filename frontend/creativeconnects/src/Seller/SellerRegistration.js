@@ -3,6 +3,9 @@ import 'react-phone-input-2/lib/style.css'; // Import styles for react-phone-inp
 import PhoneInput from 'react-phone-input-2';
 import Swal from 'sweetalert2';
 import '../styles/SellerRegistration.css';
+import SellerContractABI from "../contracts/SellerContract.json"
+import getWeb3 from "../utils/web3";
+
 
 const SellerRegistration = () => {
   const [formData, setFormData] = useState({
@@ -98,7 +101,77 @@ const SellerRegistration = () => {
     return true;
   };
 const handleSubmit = async (e) => {
+  
+  ///
   e.preventDefault();
+  try {
+      const web3 = await getWeb3();
+      const accounts = await web3.eth.getAccounts();
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = SellerContractABI.networks[networkId];
+
+      if (!deployedNetwork) {
+          alert("Error: Smart contract not deployed on this network.");
+          return;
+      }
+
+      const contract = new web3.eth.Contract(
+          SellerContractABI.abi,
+          deployedNetwork.address
+      );
+
+      // Check if email already exists in the blockchain
+      const emailExists = await contract.methods.isEmailRegistered(formData.email).call();
+      if (emailExists) {
+          Swal.fire({
+              title: "Error",
+              text: "This email is already registered. Please use a different email.",
+              icon: "error",
+          });
+          return;
+      }
+
+      // Register the seller if email is not found
+      await contract.methods
+          .registerSeller(
+              formData.firstName,
+              formData.lastName,
+              formData.email,
+              formData.phone,
+              formData.fieldDomain,
+              skills
+          )
+          .send({ from: accounts[0], gas: 600000 });
+
+      Swal.fire({
+          title: "Registration Successful",
+          text: "You have been registered on the blockchain!",
+          icon: "success",
+      });
+  } catch (error) {
+      Swal.fire({
+          title: "Registration Failed",
+          text: error.message,
+          icon: "error",
+      });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /////////////////////////
   if (!validateForm()) {
     return;
   }

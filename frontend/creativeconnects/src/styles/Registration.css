@@ -1,12 +1,12 @@
 
   /* Base Styling */
-  body{
+  /* body{
     margin: 50px;
-      align-items: center; /* Vertically centers */
-      height: 100vh; /* Makes sure the body takes full height of the viewport */
+      align-items: center; 
+      height: 100vh;        
       text-align: center;
   
-  }  
+  }   */
   .registration-flow{
     justify-content: left;
   }

@@ -3,6 +3,8 @@ import '../styles/SwapperRegistration.css';
 import 'react-phone-input-2/lib/style.css'; // Import styles for react-phone-input-2
 import PhoneInput from 'react-phone-input-2';
 import Swal from 'sweetalert2'; // Import SweetAlert2
+import SkillSwapperContractABI from "../contracts/SkillSwapperContract.json"
+import getWeb3 from "../utils/web3";
 
 function SwapperRegistration() {
   const [formData, setFormData] = useState({
@@ -90,6 +92,78 @@ function SwapperRegistration() {
   };
 
   const handleSubmit = async (e) => {
+
+e.preventDefault();
+try {
+  const web3 = await getWeb3();
+  const accounts = await web3.eth.getAccounts();
+  const networkId = await web3.eth.net.getId();
+  const deployedNetwork = SkillSwapperContractABI.networks[networkId];
+
+  if (!deployedNetwork) {
+      alert("Error: Smart contract not deployed on this network.");
+      return;
+  }
+
+  const contract = new web3.eth.Contract(
+      SkillSwapperContractABI.abi,
+      deployedNetwork.address
+  );
+
+  console.log("Checking if email exists:", formData.email);
+  const emailExists = await contract.methods.isEmailRegistered(formData.email).call();
+  console.log("Email exists:", emailExists);
+
+  if (emailExists) {
+      Swal.fire({
+          title: "Error",
+          text: "This email is already registered. Please use a different email.",
+          icon: "error",
+      });
+      return;
+  }
+
+  console.log("Registering new skill swapper");
+  await contract.methods
+      .registerSkillSwapper(
+          formData.firstName,
+          formData.lastName,
+          formData.email,
+          formData.phone,
+          formData.password,
+          formData.confirmPassword,
+          formData.expertiseHave,
+          formData.expertiseLookingFor
+      )
+      .send({ from: accounts[0], gas: 500000 });
+
+  Swal.fire({
+      title: "Registration Successful",
+      text: "You have been registered on the blockchain!",
+      icon: "success",
+  });
+} catch (error) {
+  console.error("Contract execution error: ", error);
+  Swal.fire({
+      title: "Registration Failed",
+      text: error.message,
+      icon: "error",
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////
     e.preventDefault();
 
     try {

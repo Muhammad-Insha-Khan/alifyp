@@ -9,6 +9,30 @@ const buyerSchema = mongoose.Schema({
   password: { type: String, required: true },
   fieldDomain: { type: String, required: true },
   interests: { type: [String], required: true },
+  
+  // Project Proposals
+  projectProposals: [{
+    projectTitle: { type: String, required: true },
+    requiredSkills: { type: String, required: true },
+    minBudget: { type: Number, required: true },
+    maxBudget: { type: Number, required: true },
+    timeLimit: { type: Number, required: true },
+    expertiseLevel: { type: String, required: true },
+    projectDescription: { type: String, required: true },
+    dateSubmitted: { type: Date, default: Date.now }
+  }],
+
+  // Job Descriptions
+  jobDescriptions: [{
+    jobTitle: { type: String, required: true },
+    workingHours: { type: String, required: true },
+    companyName: { type: String, required: true },
+    educationalBackground: { type: String, required: true },
+    skillsQualifications: { type: String, required: true },
+    jobDescription: { type: String, required: true },
+    jobType: { type: String, required: true }, // Can be "remote", "hybrid", or "on-site"
+    datePosted: { type: Date, default: Date.now }
+  }],
 }, { timestamps: true });
 
 // Hash password before saving
